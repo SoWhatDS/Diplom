@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemInfo : ScriptableObject
+public interface IDamageable 
 {
-    public string itemInfo;
+    void TakeDamage(float damage);
 }

@@ -1,10 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.UI;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
 {
+    [SerializeField] private Image _healthBarImage;
+    [SerializeField] private GameObject _ui;
     [SerializeField] private float _mouseSensitivity;
     [SerializeField] private float _sprintSpeed;
     [SerializeField] private float _walkSpeed;
@@ -26,10 +31,17 @@ public class PlayerController : MonoBehaviour
     private Rigidbody _rb;
     private PhotonView _PV;
 
+    private const float Max_Health = 100f;
+    private float _currentHealth = Max_Health;
+
+    PlayerManager _playerManager;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         _PV = GetComponent<PhotonView>();
+
+        _playerManager = PhotonView.Find((int)_PV.InstantiationData[0]).GetComponent<PlayerManager>();
     }
 
     private void Start()
@@ -42,6 +54,7 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(_rb);
+            Destroy(_ui);
         }
     }
 
@@ -58,6 +71,34 @@ public class PlayerController : MonoBehaviour
 
         Jump();
 
+        ChangeWeapon();
+
+        ScroolWheelChangeWeapon();
+
+        Fire();
+
+        DieForOutPerimetrMap();
+       
+    }
+
+    private void DieForOutPerimetrMap()
+    {
+        if (transform.position.y <= -10f)
+        {
+            Die();
+        }
+    }
+
+    private void Fire()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            _items[_itemIndex].Use();
+        }
+    }
+
+    private void ChangeWeapon()
+    {
         for (int i = 0; i < _items.Length; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
@@ -66,7 +107,32 @@ public class PlayerController : MonoBehaviour
                 break;
             }
         }
-   
+    }
+
+    private void ScroolWheelChangeWeapon()
+    {
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0f)
+        {
+            if (_itemIndex >= _items.Length - 1)
+            {
+                EquipItem(0);
+            }
+            else
+            {
+                EquipItem(_itemIndex + 1);
+            }
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0f)
+        {
+            if (_itemIndex <= 0)
+            {
+                EquipItem(_items.Length - 1);
+            }
+            else
+            {
+                EquipItem(_itemIndex - 1);
+            }
+        }
     }
 
     private void Look()
@@ -108,6 +174,21 @@ public class PlayerController : MonoBehaviour
         }
 
         _previousItemIndex = _itemIndex;
+
+        if (_PV.IsMine)
+        {
+            Hashtable hash = new Hashtable();
+            hash.Add("ItemIndex", _itemIndex);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        }
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (!_PV.IsMine && targetPlayer == _PV.Owner)
+        {
+            EquipItem((int)changedProps["ItemIndex"]);
+        }
     }
 
     public void SetGroundState(bool isGrounded)
@@ -122,5 +203,33 @@ public class PlayerController : MonoBehaviour
             return;
         }
         _rb.MovePosition(_rb.position + transform.TransformDirection(_moveAmount) * Time.fixedDeltaTime);
+    }
+
+    public void TakeDamage(float damage)
+    {
+        _PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+    }
+
+    [PunRPC]
+    void RPC_TakeDamage(float damage)
+    {
+        if (!_PV.IsMine)
+        {
+            return;
+        }
+
+        _currentHealth -= damage;
+
+        _healthBarImage.fillAmount = _currentHealth / Max_Health;
+
+        if(_currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        _playerManager.Die();
     }
 }
