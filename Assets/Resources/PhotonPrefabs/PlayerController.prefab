@@ -1087,7 +1087,7 @@ GameObject:
   - component: {fileID: 5330944992135039427}
   - component: {fileID: 6228218999346725331}
   m_Layer: 0
-  m_Name: Rifle
+  m_Name: MachineGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1157,7 +1157,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1386092967913530089}
   m_Layer: 0
-  m_Name: RifleGameobject
+  m_Name: MachineGunGameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

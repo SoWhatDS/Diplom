@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   itemInfo: Pistol
-  damage: 25
+  damage: 20
