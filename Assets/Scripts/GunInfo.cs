@@ -8,6 +8,7 @@ public class GunInfo : ItemInfo
     public float damage;
     public int bulletsPerMag = 30;
     public int bulletsLeft;
+    public int currentBullets;
     public AudioClip shootSound;
 
     public float fireRate;

@@ -12,14 +12,11 @@ public class SingleShotGun : Gun
     
 
     private float fireTimer;
-    private int _currentBullets;
     private AudioSource _AudioSource;
 
     private bool _isReloading;
     private float _timeReload = 1f;
     private float _reloadingTimer;
-
-
 
     PhotonView PV;
 
@@ -33,7 +30,7 @@ public class SingleShotGun : Gun
 
     private void Start()
     {
-        _currentBullets = ((GunInfo)ItemInfo).bulletsPerMag;
+        ((GunInfo)ItemInfo).currentBullets = ((GunInfo)ItemInfo).bulletsPerMag;
     }
 
     private void Update()
@@ -68,9 +65,13 @@ public class SingleShotGun : Gun
         {
             return;
         }
-
+        if (((GunInfo)ItemInfo).currentBullets <= 0)
+        {
+            Reload();
+            return;
+        }
         Shoot();
-        _currentBullets--;
+        ((GunInfo)ItemInfo).currentBullets--;
         _muzzleFlash.Play();
         PlayShootSound();
         fireTimer = 0.0f;
@@ -101,10 +102,10 @@ public class SingleShotGun : Gun
             return;
         }
 
-        int bulletsToLoad = ((GunInfo)ItemInfo).bulletsPerMag - _currentBullets;
+        int bulletsToLoad = ((GunInfo)ItemInfo).bulletsPerMag - ((GunInfo)ItemInfo).currentBullets;
         int bulletsToDeduct = (((GunInfo)ItemInfo).bulletsLeft >= bulletsToLoad) ? bulletsToLoad : ((GunInfo)ItemInfo).bulletsLeft;
         ((GunInfo)ItemInfo).bulletsLeft -= bulletsToDeduct;
-        _currentBullets += bulletsToDeduct;
+        ((GunInfo)ItemInfo).currentBullets += bulletsToDeduct;
     }
 
     [PunRPC]

@@ -1,19 +1,36 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 
 public class MachineGunShoot : Gun
 {
     [SerializeField] private Camera _camera;
+    [SerializeField] private ParticleSystem _muzzleFlash;
+    [SerializeField] private TMP_Text _reloadText;
+
+    private float fireTimer;
+    private AudioSource _AudioSource;
+
+    private bool _isReloading;
+    private float _timeReload = 1f;
+    private float _reloadingTimer;
 
     PhotonView PV;
 
-    private float fireTimer;
 
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
+        _AudioSource = GetComponent<AudioSource>();
+        _reloadText.gameObject.SetActive(false);
+    }
+
+    private void Start()
+    {
+        ((GunInfo)ItemInfo).currentBullets = ((GunInfo)ItemInfo).bulletsPerMag;
     }
 
     private void Update()
@@ -22,17 +39,62 @@ public class MachineGunShoot : Gun
         {
             fireTimer += Time.deltaTime;
         }
+
+        if (_isReloading)
+        {
+            _reloadText.gameObject.SetActive(true);
+            _reloadText.text = "Reloading";
+            _timeReload -= Time.deltaTime;
+            if (_timeReload <= 0)
+            {
+                _reloadText.gameObject.SetActive(false);
+                _isReloading = false;
+                _timeReload = 1f;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Reload();
+        }
+    }
+
+    private void Reload()
+    {
+        _isReloading = true;
+        if (((GunInfo)ItemInfo).bulletsLeft <= 0)
+        {
+            return;
+        }
+
+        int bulletsToLoad = ((GunInfo)ItemInfo).bulletsPerMag - ((GunInfo)ItemInfo).currentBullets;
+        int bulletsToDeduct = (((GunInfo)ItemInfo).bulletsLeft >= bulletsToLoad) ? bulletsToLoad : ((GunInfo)ItemInfo).bulletsLeft;
+        ((GunInfo)ItemInfo).bulletsLeft -= bulletsToDeduct;
+        ((GunInfo)ItemInfo).currentBullets += bulletsToDeduct;
     }
 
     public override void Use()
     {
-        if (fireTimer < ((GunInfo)ItemInfo).fireRate)
+        if (fireTimer < ((GunInfo)ItemInfo).fireRate || _isReloading)
         {
             return;
         }
+        if (((GunInfo)ItemInfo).currentBullets <= 0)
+        {
+            Reload();
+            return;
+        }
         Shoot();
-
+        ((GunInfo)ItemInfo).currentBullets--;
+        _muzzleFlash.Play();
+        PlayShootSound();
         fireTimer = 0.0f;
+    }
+
+    private void PlayShootSound()
+    {
+        _AudioSource.clip = ((GunInfo)ItemInfo).shootSound;
+        _AudioSource.Play();
     }
 
     private void Shoot()

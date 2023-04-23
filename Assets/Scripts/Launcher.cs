@@ -4,6 +4,9 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using System.Collections;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
@@ -19,21 +22,22 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject _playerListItem;
     [SerializeField] private GameObject _startGameButton;
 
+    [SerializeField] private Slider _loadingSlider;
+
 
     private void Awake()
     {
         Instance = this;
     }
 
+    private void Start()
+    {
+        MenuManager.Instance.OpenMenu("Main Menu");
+    }
+
     public void StartGame()
     {
         PhotonNetwork.ConnectUsingSettings(_serverSettings.AppSettings);
-        MenuManager.Instance.OpenMenu("Loading");
-    }
-
-    public void Options()
-    {
-        MenuManager.Instance.OpenMenu("Options");
     }
 
     public override void OnConnectedToMaster()
@@ -56,7 +60,6 @@ public class Launcher : MonoBehaviourPunCallbacks
             return;
         }
         PhotonNetwork.CreateRoom(_roomNameInputField.text);
-        MenuManager.Instance.OpenMenu("Loading");
     }
 
     public override void OnJoinedRoom()
@@ -92,19 +95,18 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void CreateGame()
     {
+        LoadScene(1);
         PhotonNetwork.LoadLevel(1);
     }
 
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
-        MenuManager.Instance.OpenMenu("Loading");
     }
 
     public void JoinRoom(RoomInfo info)
     {
         PhotonNetwork.JoinRoom(info.Name);
-        MenuManager.Instance.OpenMenu("Loading");
     }
 
     public override void OnLeftRoom()
@@ -138,4 +140,25 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Application.Quit();
     }
+
+    public void LoadScene(int sceneId)
+    {
+        MenuManager.Instance.OpenMenu("Loading");
+        StartCoroutine(LoadSceneAsync(1));
+    }
+
+    IEnumerator LoadSceneAsync(int sceneId)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneId);
+
+        while (!operation.isDone)
+        {
+            float progressValue = Mathf.Clamp01(operation.progress / 0.9f);
+            Debug.Log(progressValue);
+            _loadingSlider.value = progressValue;
+            yield return null;
+            
+        }
+    }
+
 }

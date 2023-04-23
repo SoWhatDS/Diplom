@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
     [SerializeField] private float _walkSpeed;
     [SerializeField] private float _jumpForce;
     [SerializeField] private float _smoothTime;
+    [SerializeField] private TMP_Text _bulletsText;
 
     [SerializeField] private GameObject _cameraHolder;
 
@@ -78,6 +80,8 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
         Fire();
 
         DieForOutPerimetrMap();
+
+        ViewBullets();
        
     }
 
@@ -227,5 +231,10 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
     private void Die()
     {
         _playerManager.Die();
+    }
+
+    private void ViewBullets()
+    {
+        _bulletsText.text = $"Bullets: {((GunInfo)_items[_itemIndex].ItemInfo).currentBullets}/{((GunInfo)_items[_itemIndex].ItemInfo).bulletsLeft}";
     }
 }
