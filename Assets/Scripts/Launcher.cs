@@ -25,10 +25,15 @@ public class Launcher : MonoBehaviourPunCallbacks
         Instance = this;
     }
 
-    private void Start()
+    public void StartGame()
     {
-        Debug.Log("Connecting to Master");
         PhotonNetwork.ConnectUsingSettings(_serverSettings.AppSettings);
+        MenuManager.Instance.OpenMenu("Loading");
+    }
+
+    public void Options()
+    {
+        MenuManager.Instance.OpenMenu("Options");
     }
 
     public override void OnConnectedToMaster()
@@ -85,7 +90,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         MenuManager.Instance.OpenMenu("Error");
     }
 
-    public void StartGame()
+    public void CreateGame()
     {
         PhotonNetwork.LoadLevel(1);
     }
@@ -127,5 +132,10 @@ public class Launcher : MonoBehaviourPunCallbacks
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         Instantiate(_playerListItem, _playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 }

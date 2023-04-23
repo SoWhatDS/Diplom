@@ -91,7 +91,7 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
 
     private void Fire()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             _items[_itemIndex].Use();
         }

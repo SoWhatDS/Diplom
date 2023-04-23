@@ -14,3 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemInfo: Pistol
   damage: 20
+  bulletsPerMag: 7
+  bulletsLeft: 50
+  shootSound: {fileID: 8300000, guid: 756c4e23e8553954fa91b4cc2936afa0, type: 3}
+  fireRate: 0.5
