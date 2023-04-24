@@ -5,13 +5,16 @@ using System.IO;
 using Photon.Realtime;
 using System.Linq;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using System.Collections.Generic;
 
 public class PlayerManager : MonoBehaviour
 {
     PhotonView PV;
+    [SerializeField] private List<EnemyAi> _enemies = new List<EnemyAi>();
 
 
     private GameObject _controller;
+    private GameObject[] _enemyControllers;
 
     private int _kills;
     private int _deaths;
@@ -22,6 +25,7 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
+        _enemyControllers = new GameObject[_enemies.Count]; 
     }
 
     private void Start()

@@ -5,6 +5,7 @@ using PlayFab;
 using PlayFab.ClientModels;
 using System;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayFabManager : MonoBehaviour
 {
@@ -93,8 +94,8 @@ public class PlayFabManager : MonoBehaviour
         {
 
             GameObject newGO = Instantiate(rowPrefab, rowsParent);
-            Text[] texts = newGO.GetComponentsInChildren<Text>();
-            texts[0].text = (item.Position +1).ToString();
+            TMP_Text[] texts = newGO.GetComponentsInChildren<TMP_Text>();
+            texts[0].text = (item.Position+1).ToString();
             texts[1].text = item.PlayFabId;
             texts[2].text = item.StatValue.ToString();
 
