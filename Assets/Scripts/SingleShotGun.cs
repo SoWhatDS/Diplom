@@ -15,7 +15,7 @@ public class SingleShotGun : Gun
     private AudioSource _AudioSource;
 
     private bool _isReloading;
-    private float _timeReload = 1f;
+    private float _timeReload = 3f;
     private float _reloadingTimer;
 
     PhotonView PV;
@@ -49,7 +49,7 @@ public class SingleShotGun : Gun
             {
                 _reloadText.gameObject.SetActive(false);
                 _isReloading = false;
-                _timeReload = 1f;
+                _timeReload = 3f;
             }
         }
 
@@ -96,12 +96,12 @@ public class SingleShotGun : Gun
 
     private void Reload()
     {
+        AudioManager.Instance.PlaySFX("Reloaded");
         _isReloading = true;
         if (((GunInfo)ItemInfo).bulletsLeft <= 0)
         {
             return;
         }
-
         int bulletsToLoad = ((GunInfo)ItemInfo).bulletsPerMag - ((GunInfo)ItemInfo).currentBullets;
         int bulletsToDeduct = (((GunInfo)ItemInfo).bulletsLeft >= bulletsToLoad) ? bulletsToLoad : ((GunInfo)ItemInfo).bulletsLeft;
         ((GunInfo)ItemInfo).bulletsLeft -= bulletsToDeduct;

@@ -4,6 +4,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -21,6 +22,8 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
     [SerializeField] private GameObject _cameraHolder;
 
     [SerializeField] private Item[] _items;
+
+    [SerializeField] private GameObject pauseMenu;
 
     private int _itemIndex;
     private int _previousItemIndex = -1;
@@ -48,6 +51,8 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
 
     private void Start()
     {
+        PauseMenu.isOn = false;
+
         if (_PV.IsMine)
         {
             EquipItem(0);
@@ -65,6 +70,22 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
         if (!_PV.IsMine)
         {
             return;
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePauseMenu();
+        }
+        if (PauseMenu.isOn)
+        {
+            if (Cursor.lockState != CursorLockMode.None)
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
+            return;
+        }
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         Look();
@@ -160,6 +181,7 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
         {
             _rb.AddForce(transform.up * _jumpForce);
+            AudioManager.Instance.PlaySFX("Jump");
         }
     }
 
@@ -225,6 +247,7 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
         {
             Die();
             PlayerManager.Find(info.Sender).GetKill();
+            
         }
     }
 
@@ -236,5 +259,22 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
     private void ViewBullets()
     {
         _bulletsText.text = $"Bullets: {((GunInfo)_items[_itemIndex].ItemInfo).currentBullets}/{((GunInfo)_items[_itemIndex].ItemInfo).bulletsLeft}";
+    }
+
+    public void TogglePauseMenu()
+    {
+        pauseMenu.SetActive(!pauseMenu.activeSelf);
+        PauseMenu.isOn = pauseMenu.activeSelf;
+    }
+
+    public void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
+        SceneManager.LoadScene(0);
+    }
+
+    private void TakeExp()
+    {
+       
     }
 }

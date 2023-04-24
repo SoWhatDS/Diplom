@@ -16,6 +16,6 @@ MonoBehaviour:
   damage: 5
   bulletsPerMag: 30
   bulletsLeft: 0
-  muzzleFlash: {fileID: 19800002, guid: 06d796ccd85dc4c4b9c98270196715ae, type: 3}
+  currentBullets: 0
   shootSound: {fileID: 8300000, guid: 8602b7d5cd15c1943a50aa53f171c8cf, type: 3}
   fireRate: 0.1

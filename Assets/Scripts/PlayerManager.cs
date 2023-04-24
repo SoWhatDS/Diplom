@@ -10,10 +10,14 @@ public class PlayerManager : MonoBehaviour
 {
     PhotonView PV;
 
+
     private GameObject _controller;
 
     private int _kills;
     private int _deaths;
+    private int _totalExp;
+    private int _expForKill = 10;
+
 
     private void Awake()
     {
@@ -40,9 +44,15 @@ public class PlayerManager : MonoBehaviour
         CreateController();
 
         _deaths++;
-
+        _totalExp -= _expForKill;
+        if (_totalExp < 0)
+        {
+            _totalExp = 0;
+        }
+        PlayFabManager.Instance.SendLeaderScore(_totalExp);
         Hashtable hash = new Hashtable();
         hash.Add("Deaths", _deaths);
+        hash.Add("TotalExp", _totalExp);
         PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
     }
 
@@ -55,8 +65,11 @@ public class PlayerManager : MonoBehaviour
     private void RPC_GetKill()
     {
         _kills++;
+        _totalExp += _expForKill;
+        PlayFabManager.Instance.SendLeaderScore(_totalExp);
         Hashtable hash = new Hashtable();
         hash.Add("Kills", _kills);
+        hash.Add("TotalExp", _totalExp);
         PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
     }
 
