@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
     private PhotonView _PV;
 
     private const float Max_Health = 100f;
-    private float _currentHealth = Max_Health;
+    public float _currentHealth = Max_Health;
 
     PlayerManager _playerManager;
 
@@ -69,6 +69,7 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
     {
         if (!_PV.IsMine)
         {
+            _bulletsText.gameObject.SetActive(false);
             return;
         }
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -273,8 +274,11 @@ public class PlayerController : MonoBehaviourPunCallbacks,IDamageable
         SceneManager.LoadScene(0);
     }
 
-    private void TakeExp()
+    private void OnTriggerEnter(Collider other)
     {
-       
+        if (other.GetComponent<Trap>())
+        {
+            Die();
+        }
     }
 }

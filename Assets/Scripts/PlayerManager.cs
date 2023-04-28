@@ -10,11 +10,9 @@ using System.Collections.Generic;
 public class PlayerManager : MonoBehaviour
 {
     PhotonView PV;
-    [SerializeField] private List<EnemyAi> _enemies = new List<EnemyAi>();
 
 
     private GameObject _controller;
-    private GameObject[] _enemyControllers;
 
     private int _kills;
     private int _deaths;
@@ -25,7 +23,6 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
-        _enemyControllers = new GameObject[_enemies.Count]; 
     }
 
     private void Start()
@@ -46,17 +43,9 @@ public class PlayerManager : MonoBehaviour
     {
         PhotonNetwork.Destroy(_controller);
         CreateController();
-
         _deaths++;
-        _totalExp -= _expForKill;
-        if (_totalExp < 0)
-        {
-            _totalExp = 0;
-        }
-        PlayFabManager.Instance.SendLeaderScore(_totalExp);
         Hashtable hash = new Hashtable();
         hash.Add("Deaths", _deaths);
-        hash.Add("TotalExp", _totalExp);
         PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
     }
 
@@ -70,7 +59,7 @@ public class PlayerManager : MonoBehaviour
     {
         _kills++;
         _totalExp += _expForKill;
-        PlayFabManager.Instance.SendLeaderScore(_totalExp);
+        PlayFabManager.Instance.SendLeaderScore(_expForKill);
         Hashtable hash = new Hashtable();
         hash.Add("Kills", _kills);
         hash.Add("TotalExp", _totalExp);

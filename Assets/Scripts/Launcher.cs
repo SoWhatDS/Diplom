@@ -7,6 +7,7 @@ using Photon.Realtime;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
@@ -59,7 +60,11 @@ public class Launcher : MonoBehaviourPunCallbacks
         {
             return;
         }
-        PhotonNetwork.CreateRoom(_roomNameInputField.text);
+        RoomOptions roomOtions = new RoomOptions();
+        Hashtable options = new Hashtable();
+        options.Add("Time", 180);
+        roomOtions.CustomRoomProperties = options;
+        PhotonNetwork.CreateRoom(_roomNameInputField.text, roomOtions);
     }
 
     public override void OnJoinedRoom()

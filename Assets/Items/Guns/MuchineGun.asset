@@ -15,7 +15,7 @@ MonoBehaviour:
   itemInfo: MachineGun
   damage: 5
   bulletsPerMag: 30
-  bulletsLeft: 0
-  currentBullets: 0
+  bulletsLeft: 10000000
+  currentBullets: 30
   shootSound: {fileID: 8300000, guid: 8602b7d5cd15c1943a50aa53f171c8cf, type: 3}
   fireRate: 0.1
